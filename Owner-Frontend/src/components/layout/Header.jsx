@@ -36,10 +36,6 @@ function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard" className="nav-link">
