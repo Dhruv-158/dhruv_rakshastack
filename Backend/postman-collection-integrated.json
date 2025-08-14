@@ -1,0 +1,923 @@
+{
+  "info": {
+    "name": "PG Management API - Integrated Version",
+    "description": "Complete API collection for PG Management Backend with integrated image upload endpoints",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "owner_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pg_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔧 System Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/../health",
+              "host": ["{{base_url}}"],
+              "path": ["..", "health"]
+            }
+          }
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 User Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.user) {",
+                  "        pm.collectionVariables.set('user_id', response.data.user.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"TestPass123\",\n  \"phone\": \"9876543210\",\n  \"gender\": \"male\",\n  \"age\": 25,\n  \"occupation\": \"Student\",\n  \"preferred_location\": \"Ahmedabad\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(200)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('auth_token', response.data.token);",
+                  "        if (response.data.user) {",
+                  "            pm.collectionVariables.set('user_id', response.data.user.id);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"TestPass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile (Text Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test User\",\n  \"phone\": \"9876543211\",\n  \"occupation\": \"Software Developer\",\n  \"preferred_location\": \"Mumbai\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "🖼️ Update User Profile with Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload profile image (JPEG, PNG, GIF, WebP - Max 5MB)"
+                },
+                {
+                  "key": "name",
+                  "value": "Updated Test User with Image",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "9876543222",
+                  "type": "text"
+                },
+                {
+                  "key": "occupation",
+                  "value": "Full Stack Developer",
+                  "type": "text"
+                },
+                {
+                  "key": "preferred_location",
+                  "value": "Bangalore",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile/{{user_id}}/with-image",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile", "{{user_id}}", "with-image"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏠 Owner Management",
+      "item": [
+        {
+          "name": "Register Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.owner) {",
+                  "        pm.collectionVariables.set('owner_id', response.data.owner.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Owner\",\n  \"email\": \"testowner@example.com\",\n  \"password\": \"OwnerPass123\",\n  \"phone\": \"9876543210\",\n  \"address\": \"123 Main Street, Ahmedabad\",\n  \"city\": \"Ahmedabad\",\n  \"business_name\": \"Premium PG Services\",\n  \"experience_years\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/owners/register",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(200)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('auth_token', response.data.token);",
+                  "        if (response.data.owner) {",
+                  "            pm.collectionVariables.set('owner_id', response.data.owner.id);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testowner@example.com\",\n  \"password\": \"OwnerPass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/owners/login",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Owner Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Owner Profile (Text Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Owner\",\n  \"phone\": \"9876543211\",\n  \"business_name\": \"Elite PG Services\",\n  \"experience_years\": 6\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}"]
+            }
+          }
+        },
+        {
+          "name": "🖼️ Update Owner Profile with Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload profile image (JPEG, PNG, GIF, WebP - Max 5MB)"
+                },
+                {
+                  "key": "name",
+                  "value": "Updated Test Owner with Image",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "9876543222",
+                  "type": "text"
+                },
+                {
+                  "key": "business_name",
+                  "value": "Premium Elite PG Services",
+                  "type": "text"
+                },
+                {
+                  "key": "experience_years",
+                  "value": "7",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}/with-image",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}", "with-image"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Owner Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Get My PG Listings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}/pg-listings",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}", "pg-listings"]
+            }
+          }
+        },
+        {
+          "name": "Update PG Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}/pg-listings/{{pg_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}", "pg-listings", "{{pg_id}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Business Metrics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/owners/{{owner_id}}/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["owners", "{{owner_id}}", "metrics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 PG Listings",
+      "item": [
+        {
+          "name": "Get All PG Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pgs/pg-listings",
+              "host": ["{{base_url}}"],
+              "path": ["pgs", "pg-listings"]
+            }
+          }
+        },
+        {
+          "name": "Search PG Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pgs/search?city=Ahmedabad&minPrice=3000&maxPrice=8000&gender=male&search=wifi",
+              "host": ["{{base_url}}"],
+              "path": ["pgs", "search"],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "Ahmedabad"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "3000"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "8000"
+                },
+                {
+                  "key": "gender",
+                  "value": "male"
+                },
+                {
+                  "key": "search",
+                  "value": "wifi"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get PG Details by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(200)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('pg_id', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pgs/pg-details/{{pg_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pgs", "pg-details", "{{pg_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Add PG Listing (Text Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.pgListing) {",
+                  "        pm.collectionVariables.set('pg_id', response.data.pgListing.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test PG\",\n  \"location\": \"Satellite, Ahmedabad\",\n  \"address\": \"123 Test Street, Satellite\",\n  \"city\": \"Ahmedabad\",\n  \"price\": 5000,\n  \"security_deposit\": 10000,\n  \"amenities\": [\"WiFi\", \"Parking\", \"Laundry\"],\n  \"gender\": \"male\",\n  \"room_type\": \"double\",\n  \"available_rooms\": 5,\n  \"total_rooms\": 10,\n  \"description\": \"A comfortable PG with all modern amenities\",\n  \"rules\": [\"No smoking\", \"No loud music after 10 PM\"],\n  \"contact_phone\": \"9876543210\",\n  \"contact_email\": \"testpg@example.com\",\n  \"wifi\": true,\n  \"parking\": true,\n  \"laundry\": true,\n  \"food_included\": false,\n  \"ac\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pgs/add-pg",
+              "host": ["{{base_url}}"],
+              "path": ["pgs", "add-pg"]
+            }
+          }
+        },
+        {
+          "name": "🖼️ Add PG Listing with Images",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.to.have.status(201)) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.pgListing) {",
+                  "        pm.collectionVariables.set('pg_id', response.data.pgListing.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload multiple PG images (Max 10 files, 5MB each)"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "",
+                  "description": "Additional image (optional)"
+                },
+                {
+                  "key": "name",
+                  "value": "Premium PG with Images",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "CG Road, Ahmedabad",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "456 Premium Street, CG Road",
+                  "type": "text"
+                },
+                {
+                  "key": "city",
+                  "value": "Ahmedabad",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "7500",
+                  "type": "text"
+                },
+                {
+                  "key": "security_deposit",
+                  "value": "15000",
+                  "type": "text"
+                },
+                {
+                  "key": "amenities",
+                  "value": "[\"WiFi\", \"Parking\", \"Laundry\", \"AC\", \"Food\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "gender",
+                  "value": "both",
+                  "type": "text"
+                },
+                {
+                  "key": "room_type",
+                  "value": "single",
+                  "type": "text"
+                },
+                {
+                  "key": "available_rooms",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "total_rooms",
+                  "value": "8",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Premium PG with all modern amenities and great location",
+                  "type": "text"
+                },
+                {
+                  "key": "rules",
+                  "value": "[\"No smoking\", \"No loud music after 10 PM\", \"Visitors allowed till 9 PM\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "contact_phone",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "contact_email",
+                  "value": "premium@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "wifi",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "parking",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "laundry",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "food_included",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "ac",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/pgs/add-with-images",
+              "host": ["{{base_url}}"],
+              "path": ["pgs", "add-with-images"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🗂️ Legacy Image API (Deprecated)",
+      "item": [
+        {
+          "name": "⚠️ Upload Profile Image (Legacy)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload single profile image (Max 5MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/images/profile",
+              "host": ["{{base_url}}"],
+              "path": ["images", "profile"]
+            }
+          }
+        },
+        {
+          "name": "⚠️ Upload PG Images (Legacy)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "pgImages",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload multiple PG images (Max 10 files)"
+                },
+                {
+                  "key": "pgImages",
+                  "type": "file",
+                  "src": "",
+                  "description": "Additional PG image"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/images/pg-images",
+              "host": ["{{base_url}}"],
+              "path": ["images", "pg-images"]
+            }
+          }
+        },
+        {
+          "name": "Get Image Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/images/info/sample-image.jpg",
+              "host": ["{{base_url}}"],
+              "path": ["images", "info", "sample-image.jpg"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
